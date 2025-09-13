@@ -7,7 +7,26 @@ export const useCardStore = defineStore('cardStore', {
     cards: [], // Empezamos con una lista de cartas vacía.
     loading: false, // Un estado para saber si estamos cargando datos.
     error: null, // Para guardar un posible error.
+    searchTerm: '',
   }),
+
+  // Sección de Getters
+  getters: {
+    /**
+     * Devuelve las cartas filtradas por el término de búsqueda.
+     * Si no hay término de búsqueda, devuelve todas las cartas.
+     */
+    filteredCards: (state) => {
+      // Si el término de búsquedas está vacío, no hay nada que filtrar.
+      if (!state.searchTerm) {
+        return state.cards;
+      }
+      // Si hay un término, filtramos el array.
+      return state.cards.filter(card =>
+      card.name.toLowerCase().includes(state.searchTerm.toLowerCase())
+      );
+    },
+  },
 
   // Actions: Las funciones que modifican el estado.
   actions: {

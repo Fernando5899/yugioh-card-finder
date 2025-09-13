@@ -1,45 +1,42 @@
 <script setup>
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useCardStore } from '@/stores/cardStore.js';
+import { useCardStore } from '@/stores/cardStore';
+import SearchInput from '@/components/SearchInput.vue';
 
-// 1. Obtenemos acceso a nuestro almacén de cartas
 const cardStore = useCardStore();
 
-// 2. Extraemos las propiedades que queremos usar (cards, loading, error) de forma 'reactiva'
-// Esto asegura que nuestro componente se actualice cuando estos valores cambien.
-const { cards, loading, error } = storeToRefs(cardStore);
+// 1. CAMBIO AQUÍ: Pedimos 'filteredCards' en lugar de 'cards'.
+const { loading, error, filteredCards } = storeToRefs(cardStore);
 
-// 3. 'onMounted' es un 'gancho del ciclo de vida'. La función que le pasemos
-// Se ejecutará automáticamente en cuanto el componente esté listo y montado en la pantalla.
 onMounted(() => {
-  cardStore.fetchCards(); // Llamamos a la acción para que busque cartas en el servidor.
+  cardStore.fetchCards();
 });
 </script>
 
 <template>
   <main>
-    <h1> Buscador de Cartas de Yu-Gi-Oh! </h1>
+    <h1>Buscador de Cartas de Yu-Gi-Oh!</h1>
+    <SearchInput />
 
     <div v-if="loading">
-      <h2> Cargando cartas... </h2>
+      <h2>Cargando cartas... 🌀</h2>
     </div>
 
     <div v-else-if="error">
-      <h2>Ha ocurrido un Error: {{ error.message }}</h2>
+      <h2>Ha ocurrido un error: {{ error.message }}</h2>
     </div>
 
     <div v-else class="card-grid">
-      <div v-for="card in cards" :key="card.id" class="card-item">
+      <div v-for="card in filteredCards" :key="card.id" class="card-item">
         <img :src="card.card_images[0].image_url_small" :alt="card.name" />
       </div>
     </div>
-
   </main>
 </template>
 
 <style>
-/* Unos estilos básicos para que se vea como una cuadricula */
+/* Estilos sin cambios */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -56,4 +53,3 @@ h2 {
   font-family: sans-serif;
 }
 </style>
-
