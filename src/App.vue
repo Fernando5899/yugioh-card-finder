@@ -1,85 +1,59 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useCardStore } from '@/stores/cardStore.js';
+
+// 1. Obtenemos acceso a nuestro almacén de cartas
+const cardStore = useCardStore();
+
+// 2. Extraemos las propiedades que queremos usar (cards, loading, error) de forma 'reactiva'
+// Esto asegura que nuestro componente se actualice cuando estos valores cambien.
+const { cards, loading, error } = storeToRefs(cardStore);
+
+// 3. 'onMounted' es un 'gancho del ciclo de vida'. La función que le pasemos
+// Se ejecutará automáticamente en cuanto el componente esté listo y montado en la pantalla.
+onMounted(() => {
+  cardStore.fetchCards(); // Llamamos a la acción para que busque cartas en el servidor.
+});
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <main>
+    <h1> Buscador de Cartas de Yu-Gi-Oh! </h1>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+    <div v-if="loading">
+      <h2> Cargando cartas... </h2>
     </div>
-  </header>
 
-  <RouterView />
+    <div v-else-if="error">
+      <h2>Ha ocurrido un Error: {{ error.message }}</h2>
+    </div>
+
+    <div v-else class="card-grid">
+      <div v-for="card in cards" :key="card.id" class="card-item">
+        <img :src="card.card_images[0].image_url_small" :alt="card.name" />
+      </div>
+    </div>
+
+  </main>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style>
+/* Unos estilos básicos para que se vea como una cuadricula */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
+.card-item img {
   width: 100%;
-  font-size: 12px;
+  display: block;
+}
+
+h2 {
   text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+  font-family: sans-serif;
 }
 </style>
+
