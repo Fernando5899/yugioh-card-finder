@@ -2,48 +2,51 @@ import { defineStore } from 'pinia';
 import { fetchAllCards } from '@/services/ygoApiService.js';
 
 export const useCardStore = defineStore('cardStore', {
-  // State: El corazón de nuestro almacén, donde se almacenan los datos
   state: () => ({
-    cards: [], // Empezamos con una lista de cartas vacía.
-    loading: false, // Un estado para saber si estamos cargando datos.
-    error: null, // Para guardar un posible error.
+    allCards: [],
+    loading: false,
+    error: null,
     searchTerm: '',
+    // --- LISTA DE FORMATOS SIMPLIFICADA ---
+    banlistFormats: ['TCG', 'OCG', 'GOAT'],
+    selectedBanlist: '',
   }),
 
-  // Sección de Getters
   getters: {
-    /**
-     * Devuelve las cartas filtradas por el término de búsqueda.
-     * Si no hay término de búsqueda, devuelve todas las cartas.
-     */
     filteredCards: (state) => {
-      // Si el término de búsquedas está vacío, no hay nada que filtrar.
-      if (!state.searchTerm) {
-        return state.cards;
+      let cardsToFilter = state.allCards;
+
+      // 1. Filtramos por Banlist (lógica simplificada)
+      if (state.selectedBanlist) {
+        const format = state.selectedBanlist;
+        cardsToFilter = state.allCards.filter(card => {
+          if (format === 'TCG') return card.banlist_info?.ban_tcg;
+          if (format === 'OCG') return card.banlist_info?.ban_ocg;
+          if (format === 'GOAT') return card.banlist_info?.ban_goat;
+          return false;
+        });
       }
-      // Si hay un término, filtramos el array.
-      return state.cards.filter(card =>
-      card.name.toLowerCase().includes(state.searchTerm.toLowerCase())
-      );
+
+      // 2. Filtramos por término de búsqueda
+      if (state.searchTerm) {
+        cardsToFilter = cardsToFilter.filter(card =>
+          card.name.toLowerCase().includes(state.searchTerm.toLowerCase())
+        );
+      }
+
+      return cardsToFilter;
     },
   },
 
-  // Actions: Las funciones que modifican el estado.
   actions: {
-    async fetchCards() {
-      this.loading = true; // Ponemos el estado de carga en true.
-      this.error = null; // Reseteamos cualquier error anterior.
-
+    async fetchAllCards() {
+      this.loading = true;
+      this.error = null;
       try {
-        // Lamamos a nuestro 'mensajero' y esperamos la respuesta.
-        const allCards = await fetchAllCards();
-        // Cuando las trae, las guardamos en el estado.
-        this.cards = allCards;
+        this.allCards = await fetchAllCards();
       } catch (err) {
-        // Si hay un error, guardamos el mensaje de error.
         this.error = err;
       } finally {
-        // Al final, sea cual sea el resultado dejamos de cargar.
         this.loading = false;
       }
     },

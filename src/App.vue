@@ -3,6 +3,7 @@ import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCardStore } from '@/stores/cardStore';
 import SearchInput from '@/components/SearchInput.vue';
+import BanlistFilters from '@/components/BanlistFilters.vue'
 
 const cardStore = useCardStore();
 
@@ -10,7 +11,7 @@ const cardStore = useCardStore();
 const { loading, error, filteredCards } = storeToRefs(cardStore);
 
 onMounted(() => {
-  cardStore.fetchCards();
+  cardStore.fetchAllCards();
 });
 </script>
 
@@ -18,7 +19,7 @@ onMounted(() => {
   <main>
     <h1>Buscador de Cartas de Yu-Gi-Oh!</h1>
     <SearchInput />
-
+    <BanlistFilters />
     <div v-if="loading">
       <h2>Cargando cartas... 🌀</h2>
     </div>
