@@ -34,11 +34,12 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       <ThemeToggle />
     </header>
 
-    <SearchInput />
-
-    <div class="flex flex-col md:flex-row gap-4 my-4">
-      <BanlistFilters class="w-full md:w-1/2" />
-      <TypeFilter class="w-full md:w-1/2" />
+    <div class="bg-gray-100 dark:bg-slate-800 p-4 rounded-lg mb-6">
+      <SearchInput />
+      <div class="flex flex-col md:flex-row gap-4 mt-4">
+        <BanlistFilters class="w-full md:w-1/2" />
+        <TypeFilter class="w-full md:w-1/2" />
+      </div>
     </div>
 
     <div v-if="loading">
@@ -51,7 +52,11 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
     <div v-else class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
       <div v-for="card in cards" :key="card.id" class="card-item">
         <RouterLink :to="`/card/${card.id}`">
-          <img :src="card.card_images[0].image_url_small" :alt="card.name" class="rounded-lg hover:scale-110 transition-transform duration-200" />
+          <img
+            :src="card.card_images[0].image_url_small"
+            :alt="card.name"
+            class="rounded-lg hover:scale-110 hover:shadow-lg hover:shadow-cyan-400/50 transition-all duration-300"
+          />
         </RouterLink>
       </div>
     </div>
