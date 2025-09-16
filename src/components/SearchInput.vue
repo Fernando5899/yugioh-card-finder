@@ -15,7 +15,8 @@ const { searchTerm } = storeToRefs(cardStore);
       v-model="searchTerm"
       type="text"
       placeholder="Buscar carta por nombre..."
-      />
+      class="bg-gray-700 text-gray-200 border border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
   </div>
 </template>
 

@@ -28,7 +28,7 @@ onMounted(() => {
       <h2 class="text-2xl text-center mt-10 text-red-500">Ha ocurrido un error: {{ error.message }}</h2>
     </div>
 
-    <div v-else class="grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+    <div v-else class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
       <div v-for="card in filteredCards" :key="card.id" class="card-item">
         <img :src="card.card_images[0].image_url_small" :alt="card.name" class="rounded-lg hover:scale-110 transition-transform duration-200" />
       </div>
