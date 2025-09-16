@@ -9,7 +9,10 @@ export const useCardStore = defineStore('cardStore', {
     searchTerm: '',
     banlistFormats: ['TCG', 'OCG', 'GOAT'],
     selectedBanlist: '',
-    // --- ¡NUEVO ESTADO PARA LA PAGINACIÓN! ---
+    // --- ¡NUEVO ESTADO PARA EL FILTRO DE TIPO! ---
+    cardTypes: ['Effect Monster', 'Flip Effect Monster', 'Fusion Monster', 'Link Monster', 'Normal Monster', 'Pendulum Effect Monster', 'Ritual Monster', 'Spell Card', 'Synchro Monster', 'Trap Card', 'XYZ Monster'],
+    selectedType: '',
+    // --- Paginación ---
     currentPage: 1,
     cardsPerPage: 100,
     totalCards: 0,
@@ -17,12 +20,12 @@ export const useCardStore = defineStore('cardStore', {
 
   getters: {
     filteredCards: (state) => {
-
       let cardsToFilter = state.allCards;
 
-      if (state.selectedBanlist) {
+      // 1. Filtramos por Banlist
+      if (state.selectedBanlist && state.selectedBanlist !== 'all') {
         const format = state.selectedBanlist;
-        cardsToFilter = state.allCards.filter(card => {
+        cardsToFilter = cardsToFilter.filter(card => {
           if (format === 'TCG') return card.banlist_info?.ban_tcg;
           if (format === 'OCG') return card.banlist_info?.ban_ocg;
           if (format === 'GOAT') return card.banlist_info?.ban_goat;
@@ -30,20 +33,27 @@ export const useCardStore = defineStore('cardStore', {
         });
       }
 
+      // --- ¡NUEVO BLOQUE DE FILTRADO POR TIPO! ---
+      if (state.selectedType) {
+        cardsToFilter = cardsToFilter.filter(card => card.type === state.selectedType);
+      }
+
+      // 2. Filtramos por término de búsqueda
       if (state.searchTerm) {
         cardsToFilter = cardsToFilter.filter(card =>
           card.name.toLowerCase().includes(state.searchTerm.toLowerCase())
         );
       }
+
       return cardsToFilter;
     },
-    // --- ¡NUEVO GETTER PARA CALCULAR EL TOTAL DE PÁGINAS! ---
     totalPages: (state) => {
       if (state.totalCards === 0) return 1;
       return Math.ceil(state.totalCards / state.cardsPerPage);
     },
   },
-
+  
+  // Son las acciones que se ejecutan cuando se modifica el estado
   actions: {
     async fetchAllCards() {
       this.loading = true;
