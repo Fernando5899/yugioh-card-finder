@@ -8,6 +8,7 @@ import BanlistFilters from '@/components/BanlistFilters.vue';
 import PaginationControls from '@/components/PaginationControls.vue';
 import TypeFilter from '@/components/TypeFilter.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue'; // <-- 2. RESTAURAMOS LA IMPORTACIÓN DEL BOTÓN DE TEMA
+import CardSkeleton from '@/components/CardSkeleton.vue';
 
 const cardStore = useCardStore();
 const { loading, error, cards, searchTerm, selectedBanlist, selectedType } = storeToRefs(cardStore);
@@ -45,8 +46,11 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
     <div v-if="loading">
       <h2 class="text-2xl text-center mt-10">Cargando cartas... 🌀</h2>
     </div>
-    <div v-else-if="error">
-      <h2 class="text-2xl text-center mt-10 text-red-600 dark:text-red-400">Ha ocurrido un error: {{ error.message }}</h2>
+
+    <div v-if="loading" class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+      <div v-for="n in 20" :key="n">
+        <CardSkeleton />
+      </div>
     </div>
 
     <TransitionGroup
