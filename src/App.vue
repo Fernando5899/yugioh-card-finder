@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useCardStore } from '@/stores/cardStore';
 import SearchInput from '@/components/SearchInput.vue';
 import BanlistFilters from '@/components/BanlistFilters.vue';
+import PaginationControls from '@/components/PaginationControls.vue'
 
 const cardStore = useCardStore();
 const { loading, error, filteredCards } = storeToRefs(cardStore);
@@ -32,5 +33,6 @@ onMounted(() => {
         <img :src="card.card_images[0].image_url_small" :alt="card.name" class="rounded-lg hover:scale-110 transition-transform duration-200" />
       </div>
     </div>
+    <PaginationControls />
   </main>
 </template>
