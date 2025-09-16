@@ -2,28 +2,28 @@
 import { onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCardStore } from '@/stores/cardStore';
+import { RouterLink } from 'vue-router'; // <-- 1. RESTAURAMOS LA IMPORTACIÓN DEL ROUTERLINK
 import SearchInput from '@/components/SearchInput.vue';
 import BanlistFilters from '@/components/BanlistFilters.vue';
 import PaginationControls from '@/components/PaginationControls.vue';
 import TypeFilter from '@/components/TypeFilter.vue';
+import ThemeToggle from '@/components/ThemeToggle.vue'; // <-- 2. RESTAURAMOS LA IMPORTACIÓN DEL BOTÓN DE TEMA
 
 const cardStore = useCardStore();
 const { loading, error, cards, searchTerm, selectedBanlist, selectedType } = storeToRefs(cardStore);
 
 let debounceTimer;
 
-// La carga inicial no cambia
 onMounted(() => {
   cardStore.getCards();
 });
 
-// Este 'watch' ahora es el único responsable de llamar a la API
 watch([searchTerm, selectedBanlist, selectedType], () => {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
-    cardStore.currentPage = 1; // Volver a la primera página con cada nuevo filtro
+    cardStore.currentPage = 1;
     cardStore.getCards();
-  }, 500); // Espera 500ms antes de lanzar la búsqueda/filtro
+  }, 100);
 });
 </script>
 
@@ -33,7 +33,9 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       <h1 class="text-3xl font-bold">Buscador de Cartas de Yu-Gi-Oh!</h1>
       <ThemeToggle />
     </header>
+
     <SearchInput />
+
     <div class="flex flex-col md:flex-row gap-4 my-4">
       <BanlistFilters class="w-full md:w-1/2" />
       <TypeFilter class="w-full md:w-1/2" />

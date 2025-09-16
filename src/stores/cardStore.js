@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
-import { fetchCards } from '@/services/ygoApiService.js';
+// ¡CORRECCIÓN AQUÍ!
+import { fetchCards, fetchCardById } from '@/services/ygoApiService.js';
 
 export const useCardStore = defineStore('cardStore', {
   state: () => ({
-    cards: [], // Solo necesitamos una lista de cartas
+    cards: [],
+    currentCard: null,
     loading: false,
     error: null,
     // Estado de los filtros
@@ -14,12 +16,11 @@ export const useCardStore = defineStore('cardStore', {
     selectedType: '',
     // Estado de la paginación
     currentPage: 1,
-    cardsPerPage: 50, // Reducimos un poco para que sea más rápido
+    cardsPerPage: 50,
     totalCards: 0,
   }),
 
   getters: {
-    // El getter ahora es mucho más simple, solo calcula las páginas
     totalPages: (state) => {
       if (state.totalCards === 0) return 1;
       return Math.ceil(state.totalCards / state.cardsPerPage);
@@ -27,12 +28,10 @@ export const useCardStore = defineStore('cardStore', {
   },
 
   actions: {
-    // La ÚNICA acción que necesitamos para buscar y filtrar
     async getCards() {
       this.loading = true;
       this.error = null;
       try {
-        // Pasamos el estado actual de los filtros a nuestro servicio
         const response = await fetchCards({
           searchTerm: this.searchTerm,
           selectedBanlist: this.selectedBanlist,
@@ -49,7 +48,19 @@ export const useCardStore = defineStore('cardStore', {
       }
     },
 
-    // Esta acción ahora solo cambia la página y vuelve a llamar a la acción principal
+    async getCardById(id) {
+      this.loading = true;
+      this.currentCard = null;
+      this.error = null;
+      try {
+        this.currentCard = await fetchCardById(id);
+      } catch (err) {
+        this.error = err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async changePage(newPage) {
       if (newPage < 1 || newPage > this.totalPages) return;
       this.currentPage = newPage;
