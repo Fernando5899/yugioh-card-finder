@@ -13,7 +13,7 @@ const { cardTypes, selectedType } = storeToRefs(cardStore);
   <div class="w-full">
     <select
       v-model="selectedType"
-      class="bg-gray-700 text-white border border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <option value="" class="text-black">-- Todos los Tipos --</option>
       <option v-for="type in cardTypes" :key="type" :value="type" class="text-black">

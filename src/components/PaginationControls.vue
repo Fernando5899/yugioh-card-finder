@@ -17,7 +17,7 @@ function goToPage(page) {
     <button
       @click="goToPage(currentPage - 1)"
       :disabled="currentPage === 1"
-      class="px-4 py-2 bg-gray-700 rounded disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-gray-600"
+      class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
     >
       &lt;&lt; Anterior
     </button>
@@ -29,7 +29,7 @@ function goToPage(page) {
     <button
       @click="goToPage(currentPage + 1)"
       :disabled="currentPage === totalPages"
-      class="px-4 py-2 bg-gray-700 rounded disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-gray-600"
+      class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600"
     >
       Siguiente &gt;&gt;
     </button>

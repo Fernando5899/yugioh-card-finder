@@ -11,8 +11,8 @@ const { banlistFormats, selectedBanlist } = storeToRefs(cardStore);
     <select
       v-model="selectedBanlist"
       :class="[
-        'bg-gray-700 border border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500',
-        selectedBanlist ? 'text-white' : 'text-gray-400'
+        'bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500',
+        selectedBanlist ? 'text-gray-800 dark:text-white' : 'text-gray-500'
       ]"
     >
       <option value="" disabled class="text-black">Selecciona Formato de Banlist</option>

@@ -2,10 +2,8 @@
 import { storeToRefs } from 'pinia';
 import { useCardStore } from '@/stores/cardStore';
 
-// 1. Obtenemos acceso a nuestro almacén de cartas.
 const cardStore = useCardStore();
-
-// 2. Extraemos 'searchTerm' para poder enlazarlo con el input.
+// Simplemente nos conectamos al searchTerm del almacén
 const { searchTerm } = storeToRefs(cardStore);
 </script>
 
@@ -15,7 +13,7 @@ const { searchTerm } = storeToRefs(cardStore);
       v-model="searchTerm"
       type="text"
       placeholder="Buscar carta por nombre..."
-      class="bg-gray-700 text-gray-200 border border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg w-full p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
 </template>
