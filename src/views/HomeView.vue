@@ -23,7 +23,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
   debounceTimer = setTimeout(() => {
     cardStore.currentPage = 1;
     cardStore.getCards();
-  }, 100);
+  }, 500);
 });
 </script>
 
@@ -49,7 +49,12 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       <h2 class="text-2xl text-center mt-10 text-red-600 dark:text-red-400">Ha ocurrido un error: {{ error.message }}</h2>
     </div>
 
-    <div v-else class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+    <TransitionGroup
+      v-else
+      tag="div"
+      name="card-fade"
+      class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
+    >
       <div v-for="card in cards" :key="card.id" class="card-item">
         <RouterLink :to="`/card/${card.id}`">
           <img
@@ -59,7 +64,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
           />
         </RouterLink>
       </div>
-    </div>
+    </TransitionGroup>
 
     <PaginationControls />
   </main>

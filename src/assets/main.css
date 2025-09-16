@@ -2,3 +2,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Animación para la lista de cartas */
+.card-fade-enter-active,
+.card-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.card-fade-enter-from,
+.card-fade-leave-to {
+  opacity: 0;
+}
