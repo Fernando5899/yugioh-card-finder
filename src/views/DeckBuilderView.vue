@@ -115,7 +115,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
     </aside>
 
     <main class="w-full md:w-1/2 p-4 border-t-2 md:border-t-0 md:border-l-2 border-gray-200 dark:border-gray-700 flex flex-col">
-      <div class="flex-grow flex flex-col gap-4">
+      <div class="flex-grow flex flex-col gap-8">
         <div class="flex flex-col">
           <div class="flex justify-between items-center mb-2">
             <h3 class="text-xl font-bold">Main Deck</h3>
