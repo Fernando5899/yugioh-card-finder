@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-// ¡CORRECCIÓN AQUÍ!
 import { fetchCards, fetchCardById } from '@/services/ygoApiService.js';
 
 export const useCardStore = defineStore('cardStore', {

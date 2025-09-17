@@ -5,6 +5,7 @@ import { useCardStore } from '@/stores/cardStore';
 import { useDeckStore } from '@/stores/deckStore';
 import { RouterLink } from 'vue-router';
 import draggable from 'vuedraggable';
+import { marked } from 'marked';
 import SearchInput from '@/components/SearchInput.vue';
 import BanlistFilters from '@/components/BanlistFilters.vue';
 import PaginationControls from '@/components/PaginationControls.vue';
@@ -12,50 +13,55 @@ import TypeFilter from '@/components/TypeFilter.vue';
 import CardSkeleton from '@/components/CardSkeleton.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
 
+// --- STORES ---
 const cardStore = useCardStore();
 const { loading, error, cards, searchTerm, selectedBanlist, selectedType } = storeToRefs(cardStore);
 const deckStore = useDeckStore();
-const { mainDeck, extraDeck, sideDeck, mainDeckCount, extraDeckCount, sideDeckCount, deckStatus } = storeToRefs(deckStore);
+const { mainDeck, extraDeck, sideDeck, mainDeckCount, extraDeckCount, sideDeckCount, deckStatus, analysis, isAnalyzing } = storeToRefs(deckStore);
 
+
+// --- LÓGICA DE VALIDACIÓN PARA DRAG & DROP ---
 const extraDeckTypes = ['Fusion Monster', 'Link Monster', 'Synchro Monster', 'XYZ Monster'];
 
-// --- VERSIÓN FINAL DE LA LÓGICA DE VALIDACIÓN ---
 function checkMove(event) {
   const card = event.draggedContext.element;
   const fromId = event.from.id;
   const toId = event.to.id;
 
-  // Si se mueve dentro de la misma lista (reordenar), siempre se permite.
   if (fromId === toId) return true;
 
-  // --- VALIDACIONES DEL MAZO DE DESTINO ---
   const isExtraDeckCard = extraDeckTypes.includes(card.type);
+  const targetIsExtraDeck = toId === 'extra-deck-list';
+  const targetIsSideDeck = toId === 'side-deck-list';
+  const targetIsMainDeck = toId === 'main-deck-list';
 
-  // Regla de Tipo: ¿La carta puede ir al mazo de destino?
-  if (toId === 'main-deck-list' && isExtraDeckCard) return false;
-  if (toId === 'extra-deck-list' && !isExtraDeckCard) return false;
+  if (targetIsMainDeck || targetIsExtraDeck) {
+    if (isExtraDeckCard && !targetIsExtraDeck) { return false; }
+    if (!isExtraDeckCard && targetIsExtraDeck) { return false; }
+  }
 
-  // Regla de Tamaño: ¿El mazo de destino está lleno?
-  if (toId === 'main-deck-list' && deckStore.mainDeckCount >= 60) return false;
-  if (toId === 'extra-deck-list' && deckStore.extraDeckCount >= 15) return false;
-  if (toId === 'side-deck-list' && deckStore.sideDeckCount >= 15) return false;
+  if (targetIsExtraDeck && deckStore.extraDeckCount >= 15) { return false; }
+  if (targetIsMainDeck && deckStore.mainDeckCount >= 60) { return false; }
+  if (targetIsSideDeck && deckStore.sideDeckCount >= 15) { return false; }
 
-  // --- VALIDACIÓN DE COPIAS (SOLO AL AÑADIR UNA CARTA NUEVA) ---
-  const isAddingNewCard = !fromId; // La lista de búsqueda no tiene ID, los mazos sí.
+  const isAddingNewCard = !fromId;
   if (isAddingNewCard) {
     if (deckStore.getCardCount(card.id) >= 3) {
-      return false; // Bloquear si ya hay 3 copias
+      return false;
     }
   }
 
-  return true; // Si pasa todas las validaciones, el movimiento es válido.
+  return true;
 }
 
+
+// --- MANEJADORES DE EVENTOS ---
 function handleAddCard(card) { deckStore.addCard(card); }
 function handleRemoveFromMain(index) { deckStore.removeCardFromMain(index); }
 function handleRemoveFromExtra(index) { deckStore.removeCardFromExtra(index); }
 function handleRemoveFromSide(index) { deckStore.removeCardFromSide(index); }
 
+// --- CARGA DE DATOS ---
 onMounted(() => { cardStore.getCards(); });
 
 watch([searchTerm, selectedBanlist, selectedType], () => {
@@ -67,7 +73,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
 <template>
   <div class="flex flex-col md:flex-row min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-    <aside class="w-full md:w-1/2 p-6 flex flex-col">
+    <aside class="w-full md:w-1/2 p-4 flex flex-col">
       <header class="flex justify-between items-center mb-4 flex-shrink-0">
         <RouterLink to="/" class="text-2xl font-bold hover:text-cyan-400 dark:hover:text-cyan-300 transition-colors">
           Buscador de Cartas
@@ -115,8 +121,8 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       </div>
     </aside>
 
-    <main class="w-full md:w-1/2 p-6 border-t-2 md:border-t-0 md:border-l-2 border-gray-200 dark:border-gray-700 flex flex-col">
-      <div class="flex-grow flex flex-col gap-8">
+    <main class="w-full md:w-1/2 p-4 border-t-2 md:border-t-0 md:border-l-2 border-gray-200 dark:border-gray-700 flex flex-col">
+      <div class="flex-grow flex flex-col gap-6">
         <div class="flex flex-col">
           <div class="flex justify-between items-center mb-2">
             <h3 class="text-xl font-bold">Main Deck</h3>
@@ -130,7 +136,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
               item-key="id"
               group="cards"
               tag="div"
-              class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-9 gap-2"
+              class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 gap-2"
             >
               <template #item="{ element: card, index }">
                 <div class="relative group">
@@ -157,7 +163,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
               item-key="id"
               group="cards"
               tag="div"
-              class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-9 gap-2"
+              class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 gap-2"
             >
               <template #item="{ element: card, index }">
                 <div class="relative group">
@@ -184,7 +190,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
               item-key="id"
               group="cards"
               tag="div"
-              class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-9 gap-2"
+              class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-9 gap-2"
             >
               <template #item="{ element: card, index }">
                 <div class="relative group">
@@ -208,6 +214,19 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
             - {{ issue }}
           </li>
         </ul>
+        <div class="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+          <button
+            @click="deckStore.analyzeDeck()"
+            :disabled="isAnalyzing"
+            class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded disabled:bg-gray-500 disabled:cursor-wait transition-colors"
+          >
+            {{ isAnalyzing ? 'Analizando...' : 'Analizar Mazo con IA' }}
+          </button>
+
+          <div v-if="analysis" class="mt-4 prose dark:prose-invert max-w-none">
+            <div v-html="marked(analysis)"></div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
