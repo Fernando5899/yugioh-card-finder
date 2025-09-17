@@ -32,7 +32,15 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
   <main class="p-4">
     <header class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Buscador de Cartas de Yu-Gi-Oh!</h1>
-      <ThemeToggle />
+      <div class="flex items-center gap-4">
+        <RouterLink
+          to="/deck-builder"
+          class="text-lg font-semibold hover:text-cyan-400 dark:hover:text-cyan-300 transition-colors"
+        >
+          Constructor de Mazos
+        </RouterLink>
+        <ThemeToggle />
+      </div>
     </header>
 
     <div class="bg-gray-100 dark:bg-slate-800 p-4 rounded-lg mb-6">
@@ -43,14 +51,14 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       </div>
     </div>
 
-    <div v-if="loading">
-      <h2 class="text-2xl text-center mt-10">Cargando cartas... 🌀</h2>
-    </div>
-
     <div v-if="loading" class="mt-6 grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
       <div v-for="n in 20" :key="n">
         <CardSkeleton />
       </div>
+    </div>
+
+    <div v-else-if="error">
+      <h2 class="text-2xl text-center mt-10 text-red-600 dark:text-red-400">Ha ocurrido un error: {{ error.message }}</h2>
     </div>
 
     <TransitionGroup
