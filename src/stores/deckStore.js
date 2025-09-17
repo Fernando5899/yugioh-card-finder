@@ -10,9 +10,9 @@ const extraDeckTypes = [
 
 export const useDeckStore = defineStore('deck', {
   state: () => ({
-    mainDeck: useStorage('deck-main', []),
-    extraDeck: useStorage('deck-extra', []),
-    sideDeck: useStorage('deck-side', []), // <-- AÑADIMOS EL SIDE DECK
+    mainDeck: [],
+    extraDeck: [],
+    sideDeck:  [],// <-- AÑADIMOS EL SIDE DECK
   }),
 
   getters: {

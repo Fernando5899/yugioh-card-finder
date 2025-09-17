@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
-import { useStorage } from '@vueuse/core';
 
 export const useThemeStore = defineStore('theme', {
   state: () => ({
     // useStorage guarda el valor en el localStorage del navegador.
     // El tema por defecto será 'light'.
-    theme: useStorage('theme', 'light'),
+    theme: 'light'
   }),
 
   actions: {

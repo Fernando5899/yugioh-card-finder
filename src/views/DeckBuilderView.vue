@@ -12,49 +12,50 @@ import TypeFilter from '@/components/TypeFilter.vue';
 import CardSkeleton from '@/components/CardSkeleton.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
 
-// --- STORES ---
 const cardStore = useCardStore();
 const { loading, error, cards, searchTerm, selectedBanlist, selectedType } = storeToRefs(cardStore);
 const deckStore = useDeckStore();
 const { mainDeck, extraDeck, sideDeck, mainDeckCount, extraDeckCount, sideDeckCount, deckStatus } = storeToRefs(deckStore);
 
-// --- LÓGICA DE VALIDACIÓN PARA DRAG & DROP ---
 const extraDeckTypes = ['Fusion Monster', 'Link Monster', 'Synchro Monster', 'XYZ Monster'];
 
+// --- VERSIÓN FINAL DE LA LÓGICA DE VALIDACIÓN ---
 function checkMove(event) {
   const card = event.draggedContext.element;
+  const fromId = event.from.id;
+  const toId = event.to.id;
 
-  // Regla 1: Límite de 3 copias
-  if (deckStore.getCardCount(card.id) >= 3) { return false; }
+  // Si se mueve dentro de la misma lista (reordenar), siempre se permite.
+  if (fromId === toId) return true;
 
-  // Regla 2: Colocar en el mazo correcto
+  // --- VALIDACIONES DEL MAZO DE DESTINO ---
   const isExtraDeckCard = extraDeckTypes.includes(card.type);
-  const targetIsExtraDeck = event.to.id === 'extra-deck-list';
-  const targetIsSideDeck = event.to.id === 'side-deck-list';
-  const targetIsMainDeck = event.to.id === 'main-deck-list';
 
-  // Si el destino es Main o Extra, se aplican las reglas de tipo
-  if (targetIsMainDeck || targetIsExtraDeck) {
-    if (isExtraDeckCard && !targetIsExtraDeck) { return false; }
-    if (!isExtraDeckCard && targetIsExtraDeck) { return false; }
+  // Regla de Tipo: ¿La carta puede ir al mazo de destino?
+  if (toId === 'main-deck-list' && isExtraDeckCard) return false;
+  if (toId === 'extra-deck-list' && !isExtraDeckCard) return false;
+
+  // Regla de Tamaño: ¿El mazo de destino está lleno?
+  if (toId === 'main-deck-list' && deckStore.mainDeckCount >= 60) return false;
+  if (toId === 'extra-deck-list' && deckStore.extraDeckCount >= 15) return false;
+  if (toId === 'side-deck-list' && deckStore.sideDeckCount >= 15) return false;
+
+  // --- VALIDACIÓN DE COPIAS (SOLO AL AÑADIR UNA CARTA NUEVA) ---
+  const isAddingNewCard = !fromId; // La lista de búsqueda no tiene ID, los mazos sí.
+  if (isAddingNewCard) {
+    if (deckStore.getCardCount(card.id) >= 3) {
+      return false; // Bloquear si ya hay 3 copias
+    }
   }
 
-  // Regla 3: Límites de tamaño del mazo
-  if (targetIsExtraDeck && deckStore.extraDeckCount >= 15) { return false; }
-  if (targetIsMainDeck && deckStore.mainDeckCount >= 60) { return false; }
-  if (targetIsSideDeck && deckStore.sideDeckCount >= 15) { return false; }
-
-  return true; // Si todo está bien, permitir el movimiento
+  return true; // Si pasa todas las validaciones, el movimiento es válido.
 }
 
-
-// --- MANEJADORES DE EVENTOS ---
 function handleAddCard(card) { deckStore.addCard(card); }
 function handleRemoveFromMain(index) { deckStore.removeCardFromMain(index); }
 function handleRemoveFromExtra(index) { deckStore.removeCardFromExtra(index); }
 function handleRemoveFromSide(index) { deckStore.removeCardFromSide(index); }
 
-// --- CARGA DE DATOS ---
 onMounted(() => { cardStore.getCards(); });
 
 watch([searchTerm, selectedBanlist, selectedType], () => {
