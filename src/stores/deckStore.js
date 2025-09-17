@@ -1,32 +1,76 @@
 import { defineStore } from 'pinia';
+import { useStorage } from '@vueuse/core';
+
+const extraDeckTypes = [
+  'Fusion Monster',
+  'Link Monster',
+  'Synchro Monster',
+  'XYZ Monster',
+];
 
 export const useDeckStore = defineStore('deck', {
   state: () => ({
-    mainDeck: [], // Array para las cartas del mazo principal
+    mainDeck: useStorage('deck-main', []),
+    extraDeck: useStorage('deck-extra', []),
+    sideDeck: useStorage('deck-side', []), // <-- AÑADIMOS EL SIDE DECK
   }),
-  getters: {
-    // Getter para saber cuántas cartas tenemos en el mazo principal
-    mainDeckCount: (state) => state.mainDeck.length,
-  },
-  actions: {
-    // Acción para añadir una carta al mazo principal
-    addCard(card) {
-      // Lógica de reglas (la mejoraremos después):
-      // Contamos cuántas copias de esta carta tenemos en el mazo principal
-      const count = this.mainDeck.filter(c => c.id === card.id).length;
 
-      // No permitimos más de 3 copias de la misma carta
-      if (count >= 3) {
-        alert(`Ya tienes 3 copias de ${card.name}. En tu mazo.`);
-        return; // Detenemos la función
-      }
-      // Si todo está bien, añadimos la carta al mazo
-      this.mainDeck.push(card);
+  getters: {
+    mainDeckCount: (state) => state.mainDeck.length,
+    extraDeckCount: (state) => state.extraDeck.length,
+    sideDeckCount: (state) => state.sideDeck.length, // <-- Nuevo contador
+
+    getCardCount: (state) => (cardId) => {
+      const mainCount = state.mainDeck.filter(c => c.id === cardId).length;
+      const extraCount = state.extraDeck.filter(c => c.id === cardId).length;
+      const sideCount = state.sideDeck.filter(c => c.id === cardId).length; // <-- Contamos en el Side Deck
+      return mainCount + extraCount + sideCount; // Sumamos los tres
     },
-    // Acción para quitar cartas.
-    removeCard(cardIndex) {
-      // Usamos splice() para quitar un elemento del array.
+
+    deckStatus: (state) => {
+      const issues = [];
+      if (state.mainDeck.length < 40) { issues.push(`Faltan ${40 - state.mainDeck.length} cartas en el Main Deck.`); }
+      if (state.mainDeck.length > 60) { issues.push('El Main Deck no puede tener más de 60 cartas.'); }
+      if (state.extraDeck.length > 15) { issues.push('El Extra Deck no puede tener más de 15 cartas.'); }
+      if (state.sideDeck.length > 15) { issues.push('El Side Deck no puede tener más de 15 cartas.'); } // <-- Nueva regla
+
+      if (issues.length === 0) { return { isValid: true, issues: ['¡Tu mazo es válido!'] }; }
+      return { isValid: false, issues };
+    },
+  },
+
+  actions: {
+    addCard(card) {
+      const currentCount = this.getCardCount(card.id);
+      if (currentCount >= 3) {
+        alert(`Límite de 3 copias alcanzado para "${card.name}".`);
+        return;
+      }
+
+      if (extraDeckTypes.includes(card.type)) {
+        if (this.extraDeckCount >= 15) {
+          alert('El Extra Deck no puede tener más de 15 cartas.');
+          return;
+        }
+        this.extraDeck.push(card);
+      } else {
+        if (this.mainDeckCount >= 60) {
+          alert('El Main Deck no puede tener más de 60 cartas.');
+          return;
+        }
+        this.mainDeck.push(card);
+      }
+    },
+
+    removeCardFromMain(cardIndex) {
       this.mainDeck.splice(cardIndex, 1);
+    },
+
+    removeCardFromExtra(cardIndex) {
+      this.extraDeck.splice(cardIndex, 1);
+    },
+    removeCardFromSide(cardIndex) {
+      this.sideDeck.splice(cardIndex, 1);
     },
   },
 });
