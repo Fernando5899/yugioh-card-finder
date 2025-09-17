@@ -29,7 +29,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
 </script>
 
 <template>
-  <main class="p-4">
+  <main class="p-6">
     <header class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Buscador de Cartas de Yu-Gi-Oh!</h1>
       <div class="flex items-center gap-4">

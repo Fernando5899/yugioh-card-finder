@@ -19,7 +19,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-4 md:p-8">
+  <div class="p-6 md:p-8">
     <header class="flex justify-between items-center mb-8">
       <RouterLink to="/" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-bold py-2 px-4 rounded transition-colors">
         &larr; Volver al buscador

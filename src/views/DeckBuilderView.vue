@@ -67,7 +67,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
 <template>
   <div class="flex flex-col md:flex-row min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
-    <aside class="w-full md:w-1/2 p-4 flex flex-col">
+    <aside class="w-full md:w-1/2 p-6 flex flex-col">
       <header class="flex justify-between items-center mb-4 flex-shrink-0">
         <RouterLink to="/" class="text-2xl font-bold hover:text-cyan-400 dark:hover:text-cyan-300 transition-colors">
           Buscador de Cartas
@@ -115,7 +115,7 @@ watch([searchTerm, selectedBanlist, selectedType], () => {
       </div>
     </aside>
 
-    <main class="w-full md:w-1/2 p-4 border-t-2 md:border-t-0 md:border-l-2 border-gray-200 dark:border-gray-700 flex flex-col">
+    <main class="w-full md:w-1/2 p-6 border-t-2 md:border-t-0 md:border-l-2 border-gray-200 dark:border-gray-700 flex flex-col">
       <div class="flex-grow flex flex-col gap-8">
         <div class="flex flex-col">
           <div class="flex justify-between items-center mb-2">
