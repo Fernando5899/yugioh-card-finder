@@ -23,5 +23,10 @@ export const useDeckStore = defineStore('deck', {
       // Si todo está bien, añadimos la carta al mazo
       this.mainDeck.push(card);
     },
+    // Acción para quitar cartas.
+    removeCard(cardIndex) {
+      // Usamos splice() para quitar un elemento del array.
+      this.mainDeck.splice(cardIndex, 1);
+    },
   },
 });
